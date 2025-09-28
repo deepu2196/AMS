@@ -4,9 +4,11 @@ from app.core.config import DBSettings
 from app.core.auth import hash_password, verify_password, create_access_token
 from app.db import Database
 from app.entity.user import UserCreate, UserLogin
+from app.utils import SingletonLogger
 from app.db import *
 # from entity.expenses import *
 
+logger = SingletonLogger()
 
 def create_app() -> FastAPI:
 

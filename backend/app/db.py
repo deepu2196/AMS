@@ -44,11 +44,12 @@ class Database(metaclass=Singleton):
             cursor = self._conn.cursor()
         except mysql.connector.Error as err:
             logger.error(err)
+        return cursor
 
     #------------------USERS------------------
     def create_user(self, user_details: UserCreate) -> int:
         logger.log(f"Creating new user - {user_details.username}.")
-        with self.get_cursor as cursor:
+        with self.get_cursor() as cursor:
             cursor.execute(
                 "INSERT INTO users (username, email, password, is_admin, flat_no) VALUES (%s, %s, %s, %s, %s)",
                 (user_details.username, user_details.email, user_details.password, user_details.is_admin, user_details.flat_no),
@@ -59,7 +60,7 @@ class Database(metaclass=Singleton):
 
     def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
         logger.log(f"Retrieving user details of {username}.")
-        with self.get_cursor as cursor:
+        with self.get_cursor() as cursor:
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
             return cursor.fetchone()
 
