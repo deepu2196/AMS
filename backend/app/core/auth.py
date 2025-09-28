@@ -10,7 +10,7 @@ from app.entity.user import GetUserResponse
 
 # Load config params
 db_settings = DBSettings.from_env()
-db_connection = Database()
+db_connection = Database(db_settings)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = db_settings.SECRET_KEY

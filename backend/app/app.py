@@ -6,7 +6,7 @@ from app.db import Database
 from app.entity.user import UserCreate, UserLogin, UserCreatedResponse, TokenResponse
 from app.utils import SingletonLogger
 from app.db import *
-from entity.expenses import baseExpense, expenseCreatedResponse
+from app.entity.expenses import baseExpense, expenseCreatedResponse
 
 logger = SingletonLogger()
 
@@ -92,7 +92,7 @@ def create_app() -> FastAPI:
     @app.post(
         "/expenses",
         response_model=expenseCreatedResponse,
-        ags=[EXPENSES_TAG]
+        tags=[EXPENSES_TAG]
     )
     def create_expense(expense: baseExpense, current_user: dict = Depends(get_current_user)) -> expenseCreatedResponse:
         user_id = current_user["id"]
