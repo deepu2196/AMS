@@ -41,7 +41,7 @@ class Database(metaclass=Singleton):
             #Connect for the first time
             self._conn = self._pool.get_connection()
         try:
-            cursor = self._conn.cursor()
+            cursor = self._conn.cursor(dictionary=True)
         except mysql.connector.Error as err:
             logger.error(err)
         return cursor

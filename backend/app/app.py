@@ -58,7 +58,7 @@ def create_app() -> FastAPI:
 
     @app.post("/login")
     async def login(user: UserLogin):
-        db_user = await db_connection.get_user_by_username(user.username)
+        db_user = db_connection.get_user_by_username(user.username)
         if not db_user or not verify_password(user.password, db_user["password"]):
             raise HTTPException(status_code=401, detail="Invalid credentials")
         token = create_access_token({"user_id": db_user["id"], "is_admin": db_user["is_admin"]})
