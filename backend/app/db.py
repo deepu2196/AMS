@@ -1,4 +1,5 @@
 from mysql.connector import pooling, errorcode
+from mysql.connector.cursor import MySQLCursorDict
 import mysql.connector
 from typing import Optional, List, Dict, Any
 from app.core.config import DBSettings
@@ -10,18 +11,32 @@ logger = SingletonLogger()
 
 
 class Database(metaclass=Singleton):
+    """
+    Singleton Database Connection.
+    """
 
-    def __init__(self, db_settings: DBSettings):
+    def __init__(self, db_settings: Optional[DBSettings]):
+        """
+        Database Initialization.
+
+        Args:
+            db_settings (Optional[DBSettings]): Database configuration params. It should be None only if
+                                                    Database instance has already been created.
+        """
         logger.log("Connecting to Database")
         self.db_settings = db_settings
         self._conn = None
         self._pool = self._create_pool()
+        logger.log("Connection pool created")
         
 
     # def connect(self):
     #     self._pool = self._create_pool()
 
-    def _create_pool(self) -> pooling.PooledMySQLConnection:
+    def _create_pool(self) -> pooling.MySQLConnectionPool:
+        """
+        Creates Connection Pool.
+        """
         logger.log("Getting pooled connection")
         return pooling.MySQLConnectionPool(
             pool_name=self.db_settings.DB_POOL_NAME,
@@ -36,7 +51,13 @@ class Database(metaclass=Singleton):
             use_unicode=True
         )
     
-    def get_cursor(self):
+    def get_cursor(self) -> MySQLCursorDict:
+        """
+        Get the My SQL Cursor.
+
+        Retuns:
+            MySQLCursorDict: My SQL cursor
+        """
         if self._conn is None:
             #Connect for the first time
             self._conn = self._pool.get_connection()
@@ -48,6 +69,15 @@ class Database(metaclass=Singleton):
 
     #------------------USERS------------------
     def create_user(self, user_details: UserCreate) -> int:
+        """
+        Creates new user for AMS.
+
+        Args:
+            user_details (UserCreate): User details for creating new user
+
+        Returns:
+            int: User id of created new user
+        """
         logger.log(f"Creating new user - {user_details.username}.")
         with self.get_cursor() as cursor:
             cursor.execute(
@@ -59,6 +89,15 @@ class Database(metaclass=Singleton):
             return cursor.lastrowid
 
     def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrive user details.
+
+        Args:
+            username (str): User name
+
+        Returns:
+            Optional[Dict[str, Any]]: All the user details
+        """
         logger.log(f"Retrieving user details of {username}.")
         with self.get_cursor() as cursor:
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))

@@ -1,8 +1,11 @@
 import os
 from app.utils import SingletonLogger
+from typing import Dict
 logger = SingletonLogger()
 
 class DBSettings:
+    """Database Connection Parameters."""
+    
     def __init__(self,
                  db_host: str,
                  db_port: int,
@@ -12,6 +15,19 @@ class DBSettings:
                  db_pool_name: str,
                  db_pool_size: int,
                  secret_key: str):
+        """
+        Initialize DBSettings
+
+        Args
+            db_host (str): Database host url
+            db_port (int): Database port
+            db_name (str): Database name
+            db_user (str): Database user
+            db_password (str): Database password
+            db_pool_name (str): Database connection pool name
+            db_pool_size (int): Database connection pool size
+            secret_key (str): Secret key used for access token
+        """
         self.DB_HOST = db_host
         self.DB_PORT = db_port
         self.DB_NAME = db_name
@@ -23,7 +39,12 @@ class DBSettings:
 
     @classmethod
     def from_env(cls):
-        """Load settings from environment variables"""
+        """
+        Initialize DBSettings from the environment
+
+        Returns:
+            DBSettings: Database settings parameters
+        """
         return cls(
             db_host=os.environ.get("DB_HOST", "10.0.0.210"),
             db_port=int(os.environ.get("DB_PORT", 3306)),
@@ -36,8 +57,16 @@ class DBSettings:
         )
 
     @classmethod
-    def from_dict(cls, d: dict):
-        """Load settings from a dictionary"""
+    def from_dict(cls, d: Dict):
+        """
+        Initialize DBSettings from a dictionary
+
+        Args:
+            settings_dict (Dict): dictionary containing database settings parameters
+
+        Returns:
+            DBSettings: Database settings parameters
+        """
         return cls(
             db_host=d.get("DB_HOST", "127.0.0.1"),
             db_port=int(d.get("DB_PORT", 3306)),

@@ -1,9 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import DBSettings
 from app.core.auth import hash_password, verify_password, create_access_token
 from app.db import Database
-from app.entity.user import UserCreate, UserLogin
+from app.entity.user import UserCreate, UserLogin, UserCreatedResponse, TokenResponse
 from app.utils import SingletonLogger
 from app.db import *
 # from entity.expenses import *
@@ -15,12 +15,33 @@ def create_app() -> FastAPI:
     #Connecting to DB
     db_settings = DBSettings.from_env()
     db_connection = Database(db_settings)
-    
 
+    #constants
+    AUTHENTICATION_TAG = "Authentication"
+    EXPENSES_TAG = "Expenses"
+    USERS_TAG = "Users"
+
+    tags_metadata = [
+        {
+            "name": AUTHENTICATION_TAG,
+            "description": "Operations related to user authentication like register and login",
+        },
+        {
+            "name": EXPENSES_TAG,
+            "description": "Operations related to expenses, reports, and corpus",
+        },
+        {
+            "name": USERS_TAG,
+            "description": "User management and admin-related operations",
+        },
+    ]
+    
+    # Create FastAPI application
     app = FastAPI(
         title="Apartment Management System",
         description="REST API Documentation",
         version="0.0.1",
+        openapi_tags=tags_metadata,
     )
 
     app.add_middleware(
@@ -31,24 +52,21 @@ def create_app() -> FastAPI:
         allow_credentials=True,
     )
 
-    # @app.on_event("startup")
-    # def on_startup():
-    #     pass
-    #     # db_connection.connect()  # connect once when app starts
-
-    # # Shutdown event
-    # @app.on_event("shutdown")
-    # def on_shutdown():
-    #     if db_connection.conn:
-    #         db_connection.conn.close()
+    # Define the API Endpoints
 
     @app.get("/")
     def read_root():
-        print("root endpoint called")
         return {"msg": "Apartment Management System"}
+    
+    # Authentication API
 
-    @app.post("/register")
-    def register(user: UserCreate):
+    @app.post(
+        "/register",
+        response_model=UserCreatedResponse,
+        tags=[AUTHENTICATION_TAG],
+        status_code=status.HTTP_201_CREATED
+    )
+    def register(user: UserCreate) -> UserCreatedResponse:
         if db_connection.get_user_by_username(user.username):
             raise HTTPException(status_code=400, detail="Username already exists")
         hashed = hash_password(user.password)
@@ -56,8 +74,13 @@ def create_app() -> FastAPI:
         user_id = db_connection.create_user(user)
         return {"id": user_id}
 
-    @app.post("/login")
-    async def login(user: UserLogin):
+    @app.post(
+        "/login",
+        response_model=TokenResponse,
+        tags=[AUTHENTICATION_TAG],
+        responses={400: {"description": "Bad Request: incorrect credentials"}}
+    )
+    async def login(user: UserLogin) -> TokenResponse:
         db_user = db_connection.get_user_by_username(user.username)
         if not db_user or not verify_password(user.password, db_user["password"]):
             raise HTTPException(status_code=401, detail="Invalid credentials")

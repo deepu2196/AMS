@@ -1,13 +1,21 @@
 from pydantic import BaseModel, EmailStr
 
+# Input Models
 class UserLogin(BaseModel):
+    """
+    User Login class represents structure of User for login to AMS
+
+    Attributes:
+        username (str): username of the user
+        password (str): password of the user
+    """
     username: str
     password: str
 
     
 class BaseUser(BaseModel):
     """
-    User Create class represents fundamental structure of the user in AMS
+    Base User class represents fundamental structure of the user in AMS
 
     Attributes:
         username (str): username of the user
@@ -38,3 +46,11 @@ class User(BaseUser):
         password (str): password of the user
     """
     id: int
+
+# Output Models
+class UserCreatedResponse(BaseModel):
+    id: int
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
