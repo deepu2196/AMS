@@ -1,12 +1,12 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import DBSettings
-from app.core.auth import hash_password, verify_password, create_access_token
+from app.core.auth import hash_password, verify_password, create_access_token, get_current_user
 from app.db import Database
 from app.entity.user import UserCreate, UserLogin, UserCreatedResponse, TokenResponse
 from app.utils import SingletonLogger
 from app.db import *
-# from entity.expenses import *
+from entity.expenses import baseExpense, expenseCreatedResponse
 
 logger = SingletonLogger()
 
@@ -87,13 +87,18 @@ def create_app() -> FastAPI:
         token = create_access_token({"user_id": db_user["id"], "is_admin": db_user["is_admin"]})
         return {"access_token": token, "token_type": "bearer"}
     
+    # Expenses API
+    
+    @app.post(
+        "/expenses",
+        response_model=expenseCreatedResponse,
+        ags=[EXPENSES_TAG]
+    )
+    def create_expense(expense: baseExpense, current_user: dict = Depends(get_current_user)) -> expenseCreatedResponse:
+        user_id = current_user["id"]
+        return db_connection.create_expense(expense, user_id)
+
     return app
-
-
-# @app.post("/expenses")
-# def create_expense(expense:baseexpenses):
-#     print("post expense endpoint called")
-#     return insert_expense(expense)
 
 # @app.get("/expenses")
 # def get_expenses(expense:baseexpenses):

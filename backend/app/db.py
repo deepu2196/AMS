@@ -3,9 +3,9 @@ from mysql.connector.cursor import MySQLCursorDict
 import mysql.connector
 from typing import Optional, List, Dict, Any
 from app.core.config import DBSettings
-from app.entity.user import UserCreate
+from app.entity.user import UserCreate, GetUserResponse
 from app.utils import Singleton, SingletonLogger
-# from entity.expenses import *
+from entity.expenses import baseExpense, expenseCreate
 
 logger = SingletonLogger()
 
@@ -88,7 +88,7 @@ class Database(metaclass=Singleton):
             logger.log(f"User {user_details.username} created.")
             return cursor.lastrowid
 
-    def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
+    def get_user_by_username(self, username: str) -> Optional[GetUserResponse]:
         """
         Retrive user details.
 
@@ -100,8 +100,22 @@ class Database(metaclass=Singleton):
         """
         logger.log(f"Retrieving user details of {username}.")
         with self.get_cursor() as cursor:
-            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            cursor.execute("SELECT id, username, is_admin FROM users WHERE username = %s", (username,))
             return cursor.fetchone()
+        
+    def create_expense(self, expense: baseExpense, user_id: int):
+        with self.get_cursor() as cursor:
+            insert_stmt = """
+                INSERT INTO expenses (title, description, amount, expense_date, user_id)
+                VALUES (%s, %s, %s, %s)
+            """
+            data = (expense.title, expense.description, expense.amount, expense.expense_date, user_id)
+            cursor.execute(insert_stmt, data)
+            cursor._connection.commit()
+            return cursor.lastrowid
+            
+
+
 
 # def db_connection():
 #     #Connection to mysql DB
@@ -137,13 +151,13 @@ class Database(metaclass=Singleton):
 
 #     logger.info("connection established")
 
-#     insert_stmt = """
-#         INSERT INTO expenses (title, description, amount, date, user_id, created_at)
-#         VALUES (%s, %s, %s, %s)
-#     """
-#     data = (expense.title, expense.description, expense.amount, date.today(), 1, datetime.now())
-#     cursor.execute(insert_stmt, data)
-#     conn.commit()
+    insert_stmt = """
+        INSERT INTO expenses (title, description, amount, date, user_id, created_at)
+        VALUES (%s, %s, %s, %s)
+    """
+    data = (expense.title, expense.description, expense.amount, date.today(), 1, datetime.now())
+    cursor.execute(insert_stmt, data)
+    conn.commit()
 #     cursor.close()
 #     conn.close()
 

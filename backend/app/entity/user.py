@@ -51,6 +51,11 @@ class User(BaseUser):
 class UserCreatedResponse(BaseModel):
     id: int
 
+class GetUserResponse(BaseModel):
+    id: int
+    username: str
+    is_admin: bool
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
