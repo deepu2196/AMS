@@ -100,7 +100,7 @@ class Database(metaclass=Singleton):
         """
         logger.log(f"Retrieving user details of {username}.")
         with self.get_cursor() as cursor:
-            cursor.execute("SELECT id, username, is_admin FROM users WHERE username = %s", (username,))
+            cursor.execute("SELECT id, username, is_admin, password FROM users WHERE username = %s", (username,))
             return cursor.fetchone()
         
     def create_expense(self, expense: baseExpense, user_id: int):

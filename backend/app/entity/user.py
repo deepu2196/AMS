@@ -55,6 +55,7 @@ class GetUserResponse(BaseModel):
     id: int
     username: str
     is_admin: bool
+    password: str
 
 class TokenResponse(BaseModel):
     access_token: str
