@@ -11,6 +11,8 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def hash_password(password: str) -> str:
+    if not isinstance(password, str):
+        raise TypeError("Password must be a string")
     return pwd_context.hash(password)
 
 def verify_password(password: str, hashed: str) -> bool:

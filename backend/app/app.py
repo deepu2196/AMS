@@ -52,6 +52,7 @@ def create_app() -> FastAPI:
         if db_connection.get_user_by_username(user.username):
             raise HTTPException(status_code=400, detail="Username already exists")
         hashed = hash_password(user.password)
+        user.password = hashed
         user_id = db_connection.create_user(user)
         return {"id": user_id}
 

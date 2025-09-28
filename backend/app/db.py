@@ -54,7 +54,7 @@ class Database(metaclass=Singleton):
                 "INSERT INTO users (username, email, password, is_admin, flat_no) VALUES (%s, %s, %s, %s, %s)",
                 (user_details.username, user_details.email, user_details.password, user_details.is_admin, user_details.flat_no),
             )
-            cursor.connection.commit()
+            cursor._connection.commit()
             logger.log(f"User {user_details.username} created.")
             return cursor.lastrowid
 
