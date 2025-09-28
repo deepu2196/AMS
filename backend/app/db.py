@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any
 from app.core.config import DBSettings
 from app.entity.user import UserCreate, GetUserResponse
 from app.utils import Singleton, SingletonLogger
-from entity.expenses import baseExpense, expenseCreate
+from app.entity.expenses import baseExpense, expenseCreate
 
 logger = SingletonLogger()
 
@@ -114,54 +114,6 @@ class Database(metaclass=Singleton):
             cursor._connection.commit()
             return cursor.lastrowid
             
-
-
-
-# def db_connection():
-#     #Connection to mysql DB
-#     connection_sql = mysql.connector.connect(
-#         host='10.0.0.210',   
-#         user='admin',          
-#         password='Ams@2196',      
-#         database='test_db',             
-#         port=3306                            
-#     )
-#     return connection_sql
-
-# def create_users():
-#     conn = db_connection()
-#     cursor = conn.cursor()
-
-#     insert_stmt = """
-#         INSERT INTO users (name, email, password_hash, is_admin, created_at)
-#         VALUES (%s, %s, %s, %s, NOW())
-#     """
-#     data = ('test', 'test@exp.com', 'test12##', 1)
-#     cursor.execute(insert_stmt, data)
-#     conn.commit()
-#     cursor.close()
-#     conn.close()
-
-#     return "successfully inserted"
-
-# def insert_expense(expense: baseexpenses):
-#     print("getting connection")
-#     conn = db_connection()
-#     cursor = conn.cursor()
-
-#     logger.info("connection established")
-
-    insert_stmt = """
-        INSERT INTO expenses (title, description, amount, date, user_id, created_at)
-        VALUES (%s, %s, %s, %s)
-    """
-    data = (expense.title, expense.description, expense.amount, date.today(), 1, datetime.now())
-    cursor.execute(insert_stmt, data)
-    conn.commit()
-#     cursor.close()
-#     conn.close()
-
-#     return "successfully inserted"
 
 # def expenses_details(expense: baseexpenses):
 #     conn = db_connection()
