@@ -6,7 +6,7 @@ from app.db import Database
 from app.entity.user import UserCreate, UserLogin, UserCreatedResponse, TokenResponse
 from app.utils import SingletonLogger
 from app.db import *
-from app.entity.expenses import baseExpense, expenseCreatedResponse
+from app.entity.expenses import baseExpense, expenseCreatedResponse, expensesModel
 
 logger = SingletonLogger()
 
@@ -96,11 +96,19 @@ def create_app() -> FastAPI:
     )
     def create_expense(expense: baseExpense, current_user: dict = Depends(get_current_user)) -> expenseCreatedResponse:
         user_id = current_user["id"]
-        return db_connection.create_expense(expense, user_id)
+        expense_id =  db_connection.create_expense(expense, user_id)
+        return {"id": expense_id}
+
+    @app.get("/expenses",
+             tags=[EXPENSES_TAG])
+    def get_expenses() -> List[expensesModel]:
+        print("get expense endpoint called")
+        #expense_details = db_connection.get_expenses()
+        expense_details : List[expensesModel] = list()
+        for row in db_connection.get_expenses():
+            expense: expensesModel = row
+            expense_details.append(expense)
+        return expense_details
 
     return app
 
-# @app.get("/expenses")
-# def get_expenses(expense:baseexpenses):
-#     print("get expense endpoint called")
-#     return expenses_details(expense)

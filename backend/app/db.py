@@ -107,7 +107,7 @@ class Database(metaclass=Singleton):
         with self.get_cursor() as cursor:
             insert_stmt = """
                 INSERT INTO expenses (title, description, amount, expense_date, user_id)
-                VALUES (%s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s)
             """
             data = (expense.title, expense.description, expense.amount, expense.expense_date, user_id)
             cursor.execute(insert_stmt, data)
@@ -115,16 +115,7 @@ class Database(metaclass=Singleton):
             return cursor.lastrowid
             
 
-# def expenses_details(expense: baseexpenses):
-#     conn = db_connection()
-#     cursor = conn.cursor()
-#     select_stmt="""
-#         Select * from expenses where expenses.user_id=%s
-#     """
-#     data=(expense.user_id)
-#     cursor.execute(select_stmt,data)
-#     expense_record=cursor.fetchall()
-#     conn.commit()
-#     cursor.close()
-#     conn.close()
-#     return expense_record
+    def get_expenses(self):
+        with self.get_cursor() as cursor:
+            cursor.execute("select * from expenses")
+            return cursor.fetchall()
