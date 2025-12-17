@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any
 from app.core.config import DBSettings
 from app.entity.user import UserCreate, GetUserResponse
 from app.utils import Singleton, SingletonLogger
-from app.entity.expenses import baseExpense, expenseCreate
+from app.entity.expenses import BaseExpense, ExpenseCreate
 
 logger = SingletonLogger()
 
@@ -103,7 +103,7 @@ class Database(metaclass=Singleton):
             cursor.execute("SELECT id, username, is_admin, password FROM users WHERE username = %s", (username,))
             return cursor.fetchone()
         
-    def create_expense(self, expense: baseExpense, user_id: int):
+    def create_expense(self, expense: BaseExpense, user_id: int):
         with self.get_cursor() as cursor:
             insert_stmt = """
                 INSERT INTO expenses (title, description, amount, expense_date, user_id)
