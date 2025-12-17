@@ -23,7 +23,7 @@ class Database(metaclass=Singleton):
             db_settings (Optional[DBSettings]): Database configuration params. It should be None only if
                                                     Database instance has already been created.
         """
-        logger.log("Connecting to Database")
+        logger.log("Connecting to Database with user: {db_settings.DB_USER}")
         self.db_settings = db_settings
         self._conn = None
         self._pool = self._create_pool()
